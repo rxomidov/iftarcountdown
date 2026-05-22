@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iftar Countdown Timer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Poppins:wght@300;400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background Stars */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        /* Moon Animation */
+        .moon {
+            position: fixed;
+            top: 50px;
+            right: 100px;
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #f4e4c1 0%, #e8d5a8 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 60px rgba(244, 228, 193, 0.6),
+                        inset -20px -20px 30px rgba(0,0,0,0.1);
+            animation: moonGlow 4s ease-in-out infinite;
+        }
+
+        .moon::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            width: 20px;
+            height: 20px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 50%;
+        }
+
+        @keyframes moonGlow {
+            0%, 100% { box-shadow: 0 0 60px rgba(244, 228, 193, 0.6); }
+            50% { box-shadow: 0 0 100px rgba(244, 228, 193, 0.9); }
+        }
+
+        /* Mosque Silhouette */
+        .mosque {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(to top, #0a0a0a 0%, transparent 100%);
+            z-index: 1;
+        }
+
+        .mosque-shape {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 150px;
+            background: #0a0a0a;
+            clip-path: polygon(
+                50% 0%, 
+                60% 20%, 65% 20%, 65% 100%, 
+                35% 100%, 35% 20%, 40% 20%
+            );
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .islamic-pattern {
+            font-size: 40px;
+            color: #d4af37;
+            margin-bottom: 10px;
+            animation: rotatePattern 20s linear infinite;
+        }
+
+        @keyframes rotatePattern {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        h1 {
+            font-family: 'Amiri', serif;
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #d4af37 0%, #f4e4c1 50%, #d4af37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a8b2d1;
+            font-weight: 300;
+        }
+
+        /* Location Selector */
+        .location-selector {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 20px;
+            padding: 20px 30px;
+            margin-bottom: 40px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            animation: fadeIn 1s ease-out 0.3s both;
+        }
+
+        .location-selector input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 10px;
+            padding: 12px 20px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+            width: 200px;
+        }
+
+        .location-selector input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .location-selector input:focus {
+            border-color: #d4af37;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .location-selector button {
+            background: linear-gradient(135deg, #d4af37 0%, #f4e4c1 100%);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .location-selector button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Main Card */
+        .countdown-card {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 30px;
+            padding: 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: fadeInUp 1s ease-out 0.5s both;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .countdown-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .status-text {
+            font-size: 1.5rem;
+            color: #d4af37;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .fasting-progress {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(212, 175, 55, 0.22);
+            border-radius: 16px;
+        }
+
+        .fasting-progress-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 10px;
+            color: #f4e4c1;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .fasting-progress-percent {
+            color: #d4af37;
+            font-size: 1.15rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .fasting-progress-track {
+            width: 100%;
+            height: 12px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.25);
+        }
+
+        .fasting-progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #d4af37 0%, #f4e4c1 100%);
+            border-radius: inherit;
+            box-shadow: 0 0 18px rgba(212, 175, 55, 0.35);
+            transition: width 0.5s ease;
+        }
+
+        .time-display {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #d4af37;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Countdown Timer */
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .time-unit {
+            background: rgba(212, 175, 55, 0.1);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 20px;
+            padding: 28px;
+            width: 144px;
+            height: 144px;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s;
+            animation: fadeInScale 0.8s ease-out backwards;
+        }
+
+        .time-unit:nth-child(1) { animation-delay: 0.6s; }
+        .time-unit:nth-child(2) { animation-delay: 0.7s; }
+        .time-unit:nth-child(3) { animation-delay: 0.8s; }
+        .time-unit:nth-child(4) { animation-delay: 0.9s; }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .time-unit:hover {
+            transform: translateY(-5px);
+            border-color: #d4af37;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+        }
+
+        .time-value {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #d4af37 0%, #f4e4c1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: block;
+            line-height: 1;
+        }
+
+        .time-label {
+            font-size: 0.9rem;
+            color: #a8b2d1;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+
+        /* Prayer Times */
+        .prayer-times {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .prayer-times h3 {
+            font-family: 'Amiri', serif;
+            color: #d4af37;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+
+        .prayer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .prayer-item {
+            background: rgba(212, 175, 55, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .prayer-item:hover {
+            background: rgba(212, 175, 55, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .prayer-name {
+            color: #a8b2d1;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .prayer-time {
+            color: #d4af37;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        /* Suhoor Section Styles */
+        .divider {
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), transparent);
+            margin: 30px 0;
+        }
+
+        .suhoor-section {
+            animation: fadeIn 1s ease-out;
+        }
+
+        .suhoor-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .islamic-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .suhoor-header h3 {
+            font-family: 'Amiri', serif;
+            color: #d4af37;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .suhoor-subtitle {
+            color: #a8b2d1;
+            font-size: 0.9rem;
+        }
+
+        .suhoor-time-display {
+            text-align: center;
+            background: rgba(212, 175, 55, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .suhoor-time-label {
+            color: #a8b2d1;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .suhoor-time-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #d4af37;
+        }
+
+        .suhoor-countdown {
+            margin-bottom: 20px;
+        }
+
+        .suhoor-unit {
+            background: rgba(212, 175, 55, 0.08);
+            border-color: rgba(212, 175, 55, 0.25);
+        }
+
+        .suhoor-unit .time-value {
+            background: linear-gradient(135deg, #f4e4c1 0%, #d4af37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .suhoor-message {
+            text-align: center;
+            color: #a8b2d1;
+            font-size: 0.95rem;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            font-style: italic;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(212, 175, 55, 0.3);
+            border-radius: 50%;
+            border-top-color: #d4af37;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Celebration Animation */
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #d4af37;
+            animation: confettiFall 3s linear;
+        }
+
+        @keyframes confettiFall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .countdown-card {
+                padding: 16px;
+            }
+
+            .time-unit {
+                min-width: 80px;
+                padding: 20px 15px;
+            }
+
+            .time-value {
+                font-size: 2.5rem;
+            }
+
+            .moon {
+                width: 80px;
+                height: 80px;
+                right: 30px;
+                top: 30px;
+            }
+
+            .location-selector {
+                flex-direction: column;
+            }
+
+            .location-selector input {
+                width: 100%;
+            }
+            .time-display{
+                font-size: 2.5rem;
+            }
+            .time-unit{
+                width: 108px;
+                height: 108px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+            .suhoor-time-display{
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="stars" id="stars"></div>
+    <div class="moon"></div>
+    <div class="mosque">
+        <div class="mosque-shape"></div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="islamic-pattern">☪</div>
+            <h1>Iftar Countdown</h1>
+            <p class="subtitle">Og'iz ochilishgacha bo‘lgan vaqt</p>
+        </div>
+
+        <div class="location-selector">
+            <input type="text" id="cityInput" placeholder="Enter your city">
+            <input type="text" id="countryInput" placeholder="Country">
+            <button onclick="updateLocation()">Joylashuvni belgilash</button>
+        </div>
+        <div style="display: flex; margin-bottom: 2rem;">
+            <div class="countdown-card" style="margin-right: 2rem;">
+                <div class="fasting-progress">
+                    <div class="fasting-progress-header">
+                        <span>Ro'za vaqti progressi</span>
+                        <span class="fasting-progress-percent" id="iftarProgressPercent">0%</span>
+                    </div>
+                    <div class="fasting-progress-track">
+                        <div class="fasting-progress-fill" id="iftarProgressFill"></div>
+                    </div>
+                </div>
+                <div class="suhoor-header">
+                    <div class="islamic-icon">🌙</div>
+                    <div class="status-text" id="statusText">Iftorlik vaqti:</div>
+
+                </div>
+                <div class="suhoor-time-display">
+                    <div class="suhoor-time-label">Shom namozi vaqti:</div>
+                    <div class="time-display" id="iftarTime">--:--</div>
+                </div>
+                <div class="countdown">
+                    <div class="time-unit">
+                        <span class="time-value" id="hours">00</span>
+                        <span class="time-label">Hours</span>
+                    </div>
+                    <div class="time-unit">
+                        <span class="time-value" id="minutes">00</span>
+                        <span class="time-label">Minutes</span>
+                    </div>
+                    <div class="time-unit">
+                        <span class="time-value" id="seconds">00</span>
+                        <span class="time-label">Seconds</span>
+                    </div>
+                </div>
+
+                <div class="suhoor-message" style="margin-bottom: 2rem;">
+                        🤲 Allohumma laka sumtu va bika amantu va ‘alayka tavakkaltu va ‘ala rizqika aftartu, fag‘firli ya g‘offaruma qoddamtu va ma axxortu. AMIYN!
+                </div>
+                <div class="suhoor-message" style="margin-bottom: 2rem;">
+                    Ma’nosi:  Ey Alloh, ushbu ro‘zamni Sen uchun tutdim va Senga iymon keltirdim va Senga tavakkal qildim va bergan rizqing bilan iftor qildim. Ey gunohlarni afv qiluvchi Zot, mening avvalgi va keyingi gunohlarimni mag‘firat qilgin.
+                </div>
+            </div>
+    
+            <div class="countdown-card">
+                <div class="fasting-progress">
+                    <div class="fasting-progress-header">
+                        <span>Ro'za vaqti progressi</span>
+                        <span class="fasting-progress-percent" id="suhoorProgressPercent">0%</span>
+                    </div>
+                    <div class="fasting-progress-track">
+                        <div class="fasting-progress-fill" id="suhoorProgressFill"></div>
+                    </div>
+                </div>
+                <div class="suhoor-section">
+                    <div class="suhoor-header">
+                        <div class="islamic-icon">🌄</div>
+                        <div class="status-text" id="statusText">Saharlik vaqti:</div>
+                        <!-- <p class="suhoor-subtitle">Time until Fajr (end of Suhoor)</p> -->
+                    </div>
+                    
+                    <div class="suhoor-time-display">
+                        <div class="suhoor-time-label">Kun yorishish vaqti:</div>
+                        <div class="time-display" id="suhoorEndTime">--:--</div>
+                    </div>
+                    <div class="countdown">
+                        <div class="time-unit suhoor-unit">
+                            <span class="time-value" id="suhoorHours">00</span>
+                            <span class="time-label">Hours</span>
+                        </div>
+                        <div class="time-unit suhoor-unit">
+                            <span class="time-value" id="suhoorMinutes">00</span>
+                            <span class="time-label">Minutes</span>
+                        </div>
+                        <div class="time-unit suhoor-unit">
+                            <span class="time-value" id="suhoorSeconds">00</span>
+                            <span class="time-label">Seconds</span>
+                        </div>
+                    </div>
+
+                    <div class="suhoor-message" style="margin-bottom: 2rem;">
+                        🤲 Navvaytu an asuma sovma shahri romazona minal fajri ilal mag‘ribi, xolisan lillahi ta’ala. Allohu Akbar!
+                    </div>
+                    <div class="suhoor-message" style="margin-bottom: 2rem;">
+                        Ma’nosi: Ramazon oyining ro‘zasini subhdan to kun botgunga qadar tutmoqni niyat qildim. Xolis Alloh uchun. Alloh Buyukdir!
+                    </div>
+                    <div class="suhoor-message">
+                        P.S. Belgilangan vaqtlar "Islom uz" saytidan olindi, siz boshqa manbadan ko'rgan vaqt bilan farq qilishi mumkin.
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="countdown-card">
+            <div class="prayer-times">
+                <h3>Today's Prayer Times</h3>
+                <div class="prayer-grid" id="prayerGrid">
+                    <div class="prayer-item">
+                        <div class="prayer-name">Sahar</div>
+                        <div class="prayer-time" id="fajr">--:--</div>
+                    </div>
+                    <div class="prayer-item">
+                        <div class="prayer-name">Peshin</div>
+                        <div class="prayer-time" id="dhuhr">--:--</div>
+                    </div>
+                    <div class="prayer-item">
+                        <div class="prayer-name">Asr</div>
+                        <div class="prayer-time" id="asr">--:--</div>
+                    </div>
+                    <div class="prayer-item">
+                        <div class="prayer-name">Shom</div>
+                        <div class="prayer-time" id="maghrib">--:--</div>
+                    </div>
+                    <div class="prayer-item">
+                        <div class="prayer-name">Xufton</div>
+                        <div class="prayer-time" id="isha">--:--</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="celebration" id="celebration"></div>
+
+    <script>
+        // Create animated stars
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 100; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            starsContainer.appendChild(star);
+        }
+
+        // Default location (you can change this)
+        let currentCity = 'Tashkent';
+        let currentCountry = 'Uzbekistan';
+        let iftarTimeToday = null;
+        let prayerTimes = {};
+
+        // Fetch prayer times from API
+        async function fetchPrayerTimes(city, country) {
+            try {
+                const date = new Date();
+                const month = date.getMonth() + 1;
+                const year = date.getFullYear();
+                
+                const response = await fetch(
+                    `https://api.aladhan.com/v1/calendarByCity/${year}/${month}?city=${city}&country=${country}&method=2`
+                );
+                
+                const data = await response.json();
+                
+                if (data.code === 200 && data.data) {
+                    const today = date.getDate();
+                    const todayData = data.data.find(d => parseInt(d.date.gregorian.day) === today);
+                    
+                    if (todayData) {
+                        prayerTimes = todayData.timings;
+                        updatePrayerTimesDisplay();
+                        return prayerTimes.Maghrib;
+                    }
+                }
+                return null;
+            } catch (error) {
+                console.error('Error fetching prayer times:', error);
+                // Fallback to calculated sunset time
+                return getApproximateSunset();
+            }
+        }
+
+        // Approximate sunset calculation (fallback)
+        function getApproximateSunset() {
+            const now = new Date();
+            const sunset = new Date();
+            sunset.setHours(18, 30, 0, 0); // Default approximate time
+            return sunset.toTimeString().slice(0, 5);
+        }
+
+        // Add minutes to time string
+        function addMinutesToTime(timeStr, minutesToAdd) {
+            if (!timeStr) return timeStr;
+            const [hours, minutes] = timeStr.split(':');
+            const date = new Date();
+            date.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+            date.setMinutes(date.getMinutes() + minutesToAdd);
+            
+            const newHours = String(date.getHours()).padStart(2, '0');
+            const newMinutes = String(date.getMinutes()).padStart(2, '0');
+            return `${newHours}:${newMinutes}`;
+        }
+
+        // Update prayer times display
+        function updatePrayerTimesDisplay() {
+            document.getElementById('fajr').textContent = formatTime(addMinutesToTime(prayerTimes.Fajr, 4));
+            document.getElementById('dhuhr').textContent = formatTime(addMinutesToTime(prayerTimes.Dhuhr, 4));
+            document.getElementById('asr').textContent = formatTime(addMinutesToTime(prayerTimes.Asr, 4));
+            document.getElementById('maghrib').textContent = formatTime(addMinutesToTime(prayerTimes.Maghrib, 4));
+            document.getElementById('isha').textContent = formatTime(addMinutesToTime(prayerTimes.Isha, 4));
+            document.getElementById('iftarTime').textContent = formatTime(addMinutesToTime(prayerTimes.Maghrib, 4));
+        }
+
+        // Format time from 24h to 12h
+        function formatTime(time24) {
+            if (!time24) return '--:--';
+            const [hours, minutes] = time24.split(':');
+            const hour = parseInt(hours);
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const hour12 = hour % 12 || 12;
+            return `${hour12}:${minutes} ${ampm}`;
+        }
+
+        // Update location
+        async function updateLocation() {
+            const city = document.getElementById('cityInput').value.trim();
+            const country = document.getElementById('countryInput').value.trim();
+            
+            if (city && country) {
+                currentCity = city;
+                currentCountry = country;
+                
+                document.getElementById('statusText').innerHTML = '<span class="loading"></span> Loading...';
+                
+                iftarTimeToday = await fetchPrayerTimes(city, country);
+                
+                if (iftarTimeToday) {
+                    document.getElementById('statusText').textContent = 'Iftorlik vaqti:';
+                } else {
+                    document.getElementById('statusText').textContent = 'Could not fetch prayer times';
+                }
+            }
+        }
+
+        // Countdown logic - Update both Iftar and Suhoor
+        function updateCountdown() {
+            if (!iftarTimeToday || !prayerTimes.Fajr) return;
+
+            const now = new Date();
+            
+            // Calculate Iftar time (Maghrib + 4 minutes)
+            const adjustedIftarTime = addMinutesToTime(iftarTimeToday, 4);
+            const [iftarHours, iftarMinutes] = adjustedIftarTime.split(':');
+            const iftar = new Date();
+            iftar.setHours(parseInt(iftarHours), parseInt(iftarMinutes), 0, 0);
+
+            // Calculate Suhoor end time (Fajr - 4 minutes)
+            const adjustedFajrTime = addMinutesToTime(prayerTimes.Fajr, -4);
+            const [fajrHours, fajrMinutes] = adjustedFajrTime.split(':');
+            const fajr = new Date();
+            fajr.setHours(parseInt(fajrHours), parseInt(fajrMinutes), 0, 0);
+
+            // If Fajr has passed today, set for tomorrow
+            if (now > fajr) {
+                fajr.setDate(fajr.getDate() + 1);
+            }
+
+            // If iftar time has passed today, set for tomorrow
+            if (now > iftar) {
+                iftar.setDate(iftar.getDate() + 1);
+            }
+
+            const differenceToIftar = iftar - now;
+            const differenceToFajr = fajr - now;
+
+            // Update both countdowns simultaneously
+            updateFastingProgress(now);
+            updateIftarCountdown(differenceToIftar);
+            updateSuhoorCountdown(differenceToFajr, adjustedFajrTime);
+        }
+
+        function updateFastingProgress(now) {
+            const [fajrHours, fajrMinutes] = prayerTimes.Fajr.split(':');
+            const adjustedIftarTime = addMinutesToTime(iftarTimeToday, 4);
+            const [iftarHours, iftarMinutes] = adjustedIftarTime.split(':');
+
+            const fajrStart = new Date(now);
+            fajrStart.setHours(parseInt(fajrHours), parseInt(fajrMinutes), 0, 0);
+
+            const maghribEnd = new Date(now);
+            maghribEnd.setHours(parseInt(iftarHours), parseInt(iftarMinutes), 0, 0);
+
+            const totalDuration = maghribEnd - fajrStart;
+            const elapsedDuration = now - fajrStart;
+            const progress = totalDuration > 0
+                ? Math.min(Math.max((elapsedDuration / totalDuration) * 100, 0), 100)
+                : 0;
+
+            const progressText = `${progress.toFixed(1)}%`;
+            const progressWidth = `${progress}%`;
+
+            document.getElementById('iftarProgressPercent').textContent = progressText;
+            document.getElementById('iftarProgressFill').style.width = progressWidth;
+            document.getElementById('suhoorProgressPercent').textContent = progressText;
+            document.getElementById('suhoorProgressFill').style.width = progressWidth;
+        }
+
+        // Update Iftar countdown
+        function updateIftarCountdown(difference) {
+            if (difference <= 0) {
+                celebrate();
+                document.getElementById('statusText').textContent = "It's time for Iftar! 🌙";
+                document.getElementById('hours').textContent = '00';
+                document.getElementById('minutes').textContent = '00';
+                document.getElementById('seconds').textContent = '00';
+                return;
+            }
+
+            document.getElementById('statusText').textContent = 'Iftorlik vaqti:';
+
+            const hoursLeft = Math.floor(difference / (1000 * 60 * 60));
+            const minutesLeft = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const secondsLeft = Math.floor((difference % (1000 * 60)) / 1000);
+
+            document.getElementById('hours').textContent = String(hoursLeft).padStart(2, '0');
+            document.getElementById('minutes').textContent = String(minutesLeft).padStart(2, '0');
+            document.getElementById('seconds').textContent = String(secondsLeft).padStart(2, '0');
+        }
+
+        // Update Suhoor countdown
+        function updateSuhoorCountdown(difference, fajrTime) {
+            document.getElementById('suhoorEndTime').textContent = formatTime(fajrTime);
+
+            if (difference <= 0) {
+                document.getElementById('suhoorHours').textContent = '00';
+                document.getElementById('suhoorMinutes').textContent = '00';
+                document.getElementById('suhoorSeconds').textContent = '00';
+                document.getElementById('suhoorMessage').textContent = 'Fasting has begun. May your fast be blessed! ✨';
+                return;
+            }
+
+            const hoursLeft = Math.floor(difference / (1000 * 60 * 60));
+            const minutesLeft = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const secondsLeft = Math.floor((difference % (1000 * 60)) / 1000);
+
+            document.getElementById('suhoorHours').textContent = String(hoursLeft).padStart(2, '0');
+            document.getElementById('suhoorMinutes').textContent = String(minutesLeft).padStart(2, '0');
+            document.getElementById('suhoorSeconds').textContent = String(secondsLeft).padStart(2, '0');
+
+            // Update message based on time remaining
+            if (hoursLeft === 0 && minutesLeft < 30) {
+                document.getElementById('suhoorMessage').textContent = '⚠️ Hurry! Complete your Suhoor soon - Fajr is approaching!';
+            } else if (hoursLeft === 0 && minutesLeft < 60) {
+                document.getElementById('suhoorMessage').textContent = 'Time to have your Suhoor meal 🍽️';
+            } else if (hoursLeft < 2) {
+                document.getElementById('suhoorMessage').textContent = 'Prepare for Suhoor - Fajr is getting close';
+            } else {
+                document.getElementById('suhoorMessage').textContent = 'Make sure to complete your Suhoor before Fajr begins';
+            }
+        }
+
+        // Celebration animation
+        function celebrate() {
+            const celebration = document.getElementById('celebration');
+            celebration.innerHTML = '';
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = ['#d4af37', '#f4e4c1', '#FFD700'][Math.floor(Math.random() * 3)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    celebration.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 50);
+            }
+        }
+
+        // Initialize
+        async function init() {
+            document.getElementById('cityInput').value = currentCity;
+            document.getElementById('countryInput').value = currentCountry;
+            
+            iftarTimeToday = await fetchPrayerTimes(currentCity, currentCountry);
+            
+            // Update countdown every second
+            setInterval(updateCountdown, 1000);
+            updateCountdown();
+        }
+
+        init();
+    </script>
+</body>
+</html>
