@@ -117,8 +117,10 @@
 
         .header {
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 0px;
             animation: fadeInDown 1s ease-out;
+            display: flex;
+            align-items: center;
         }
 
         .islamic-pattern {
@@ -126,6 +128,7 @@
             color: #d4af37;
             margin-bottom: 10px;
             animation: rotatePattern 20s linear infinite;
+            margin-right: 1rem;
         }
 
         @keyframes rotatePattern {
@@ -135,7 +138,7 @@
 
         h1 {
             font-family: 'Amiri', serif;
-            font-size: 4rem;
+            font-size: 3rem;
             font-weight: 700;
             background: linear-gradient(135deg, #d4af37 0%, #f4e4c1 50%, #d4af37 100%);
             -webkit-background-clip: text;
@@ -148,6 +151,7 @@
             font-size: 1.2rem;
             color: #a8b2d1;
             font-weight: 300;
+            margin-bottom: 1rem;
         }
 
         /* Location Selector */
@@ -248,6 +252,8 @@
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(212, 175, 55, 0.22);
             border-radius: 16px;
+            width: 100%;
+            font-size: 1.5rem;
         }
 
         .fasting-progress-header {
@@ -257,20 +263,18 @@
             gap: 16px;
             margin-bottom: 10px;
             color: #f4e4c1;
-            font-size: 0.95rem;
             font-weight: 600;
         }
 
         .fasting-progress-percent {
             color: #d4af37;
-            font-size: 1.15rem;
             font-weight: 700;
             white-space: nowrap;
         }
 
         .fasting-progress-track {
             width: 100%;
-            height: 12px;
+            height: 20px;
             overflow: hidden;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 999px;
@@ -617,25 +621,25 @@
         <div class="header">
             <div class="islamic-pattern">☪</div>
             <h1>Iftar Countdown</h1>
-            <p class="subtitle">Og'iz ochilishgacha bo‘lgan vaqt</p>
         </div>
+        <p class="subtitle">Og'iz ochilishgacha bo‘lgan vaqt</p>
 
         <div class="location-selector">
             <input type="text" id="cityInput" placeholder="Enter your city">
             <input type="text" id="countryInput" placeholder="Country">
             <button onclick="updateLocation()">Joylashuvni belgilash</button>
         </div>
+        <div class="fasting-progress">
+            <div class="fasting-progress-header">
+                <span>Ro'za vaqti progressi</span>
+                <span class="fasting-progress-percent" id="iftarProgressPercent">0%</span>
+            </div>
+            <div class="fasting-progress-track">
+                <div class="fasting-progress-fill" id="iftarProgressFill"></div>
+            </div>
+        </div>
         <div style="display: flex; margin-bottom: 2rem;">
             <div class="countdown-card" style="margin-right: 2rem;">
-                <div class="fasting-progress">
-                    <div class="fasting-progress-header">
-                        <span>Ro'za vaqti progressi</span>
-                        <span class="fasting-progress-percent" id="iftarProgressPercent">0%</span>
-                    </div>
-                    <div class="fasting-progress-track">
-                        <div class="fasting-progress-fill" id="iftarProgressFill"></div>
-                    </div>
-                </div>
                 <div class="suhoor-header">
                     <div class="islamic-icon">🌙</div>
                     <div class="status-text" id="statusText">Iftorlik vaqti:</div>
@@ -669,15 +673,6 @@
             </div>
     
             <div class="countdown-card">
-                <div class="fasting-progress">
-                    <div class="fasting-progress-header">
-                        <span>Ro'za vaqti progressi</span>
-                        <span class="fasting-progress-percent" id="suhoorProgressPercent">0%</span>
-                    </div>
-                    <div class="fasting-progress-track">
-                        <div class="fasting-progress-fill" id="suhoorProgressFill"></div>
-                    </div>
-                </div>
                 <div class="suhoor-section">
                     <div class="suhoor-header">
                         <div class="islamic-icon">🌄</div>
@@ -917,8 +912,6 @@
 
             document.getElementById('iftarProgressPercent').textContent = progressText;
             document.getElementById('iftarProgressFill').style.width = progressWidth;
-            document.getElementById('suhoorProgressPercent').textContent = progressText;
-            document.getElementById('suhoorProgressFill').style.width = progressWidth;
         }
 
         // Update Iftar countdown
