@@ -256,6 +256,13 @@
             font-size: 1.5rem;
         }
 
+        .hijri-date {
+            color: #f4e4c1;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
         .fasting-progress-header {
             display: flex;
             align-items: center;
@@ -630,6 +637,7 @@
             <button onclick="updateLocation()">Joylashuvni belgilash</button>
         </div>
         <div class="fasting-progress">
+            <div class="hijri-date" id="hijriDate">Hijri sana yuklanmoqda...</div>
             <div class="fasting-progress-header">
                 <span>Ro'za vaqti progressi</span>
                 <span class="fasting-progress-percent" id="iftarProgressPercent">0%</span>
@@ -759,6 +767,7 @@
         let currentCountry = 'Uzbekistan';
         let iftarTimeToday = null;
         let prayerTimes = {};
+        let hijriDateReadable = '';
 
         // Fetch prayer times from API
         async function fetchPrayerTimes(city, country) {
@@ -779,6 +788,7 @@
                     
                     if (todayData) {
                         prayerTimes = todayData.timings;
+                        hijriDateReadable = formatHijriDate(todayData.date.hijri);
                         updatePrayerTimesDisplay();
                         return prayerTimes.Maghrib;
                     }
@@ -820,6 +830,23 @@
             document.getElementById('maghrib').textContent = formatTime(addMinutesToTime(prayerTimes.Maghrib, 4));
             document.getElementById('isha').textContent = formatTime(addMinutesToTime(prayerTimes.Isha, 4));
             document.getElementById('iftarTime').textContent = formatTime(addMinutesToTime(prayerTimes.Maghrib, 4));
+            document.getElementById('hijriDate').textContent = hijriDateReadable || 'Hijri sana topilmadi';
+        }
+
+        function formatHijriDate(hijriDate) {
+            if (!hijriDate) return '';
+
+            const readableDate = hijriDate.readable || hijriDate.date;
+            const weekday = hijriDate.weekday?.en;
+            const month = hijriDate.month?.en;
+            const year = hijriDate.year;
+            const designation = hijriDate.designation?.abbreviated || 'AH';
+
+            if (weekday && month && hijriDate.day && year) {
+                return `${weekday}, ${hijriDate.day} ${month} ${year} ${designation}`;
+            }
+
+            return readableDate || '';
         }
 
         // Format time from 24h to 12h
